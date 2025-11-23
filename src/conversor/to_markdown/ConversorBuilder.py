@@ -8,10 +8,6 @@ if TYPE_CHECKING:
 
 class ConversorBuilder(ABC):
     @abstractmethod
-    def build_conversor(self) -> ConversorBuilder:
-        pass
-
-    @abstractmethod
     def with_client(self) -> ConversorBuilder:
         pass
 

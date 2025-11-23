@@ -28,7 +28,6 @@ ConversorStrategy <|-- ConversorOpenAI
 
 ' Builder Pattern
 abstract class ConversorBuilder {
-    {abstract} +build_conversor(): ConversorBuilder
     {abstract} +with_client(): ConversorBuilder
     {abstract} +with_model(model_name: str): ConversorBuilder
     {abstract} +with_markdown_output_dir(output_dir: str): ConversorBuilder
@@ -38,9 +37,9 @@ abstract class ConversorBuilder {
 }
 
 class ConversorOpenAIBuilder {
-    -_current_conversor: Optional[ConversorOpenAI]
+    -_current_conversor: ConversorOpenAI
     
-    +build_conversor(): ConversorBuilder
+    +__init__()
     +with_client(): ConversorBuilder
     +with_model(model_name: str): ConversorBuilder
     +with_markdown_output_dir(output_dir: str): ConversorBuilder

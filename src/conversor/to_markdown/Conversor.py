@@ -23,7 +23,6 @@ class Conversor():
             pdf_path = os.getenv("PDF_PATH", "data/pdf/") + pdf_name
 
         return (builder
-                .build_conversor()
                 .with_client()
                 .with_model(model)
                 .with_pdf_path(pdf_path)

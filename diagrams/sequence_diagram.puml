@@ -14,14 +14,21 @@ participant "PyMuPDF" as PDF
 User -> Main: Executa aplicação
 activate Main
 
+create Builder
+Main -> Builder: new ConversorOpenAIBuilder()
+activate Builder
+create Strategy
+Builder -> Strategy: new ConversorOpenAI()
+note right: Produto criado no __init__
+deactivate Builder
+
 Main -> Director: create_openai_conversor(builder, params)
 activate Director
 
-Director -> Builder: build_conversor()
-activate Builder
-Builder -> Strategy: new ConversorOpenAI()
-Builder --> Director: self
-deactivate Builder
+note right of Director
+  Builder já criou o produto
+  no __init__()
+end note
 
 Director -> Builder: with_client()
 activate Builder
