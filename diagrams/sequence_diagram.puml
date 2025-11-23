@@ -1,0 +1,94 @@
+@startuml Conversor Architecture - Sequence Diagram
+
+skinparam backgroundColor #FEFEFE
+skinparam sequenceMessageAlign center
+
+actor User
+participant "main()" as Main
+participant "Conversor\n(Director)" as Director
+participant "ConversorOpenAIBuilder" as Builder
+participant "ConversorOpenAI" as Strategy
+participant "OpenAI API" as API
+participant "PyMuPDF" as PDF
+
+User -> Main: Executa aplicação
+activate Main
+
+Main -> Director: create_openai_conversor(builder, params)
+activate Director
+
+Director -> Builder: build_conversor()
+activate Builder
+Builder -> Strategy: new ConversorOpenAI()
+Builder --> Director: self
+deactivate Builder
+
+Director -> Builder: with_client()
+activate Builder
+Builder -> API: OpenAI(api_key)
+Builder --> Director: self
+deactivate Builder
+
+Director -> Builder: with_model(model)
+activate Builder
+Builder --> Director: self
+deactivate Builder
+
+Director -> Builder: with_pdf_path(path)
+activate Builder
+Builder --> Director: self
+deactivate Builder
+
+Director -> Builder: with_image_output_dir(dir)
+activate Builder
+Builder --> Director: self
+deactivate Builder
+
+Director -> Builder: with_markdown_output_dir(dir)
+activate Builder
+Builder --> Director: self
+deactivate Builder
+
+Director -> Builder: get_conversor()
+activate Builder
+Builder -> Builder: validate()
+Builder --> Director: ConversorOpenAI
+deactivate Builder
+
+Director --> Main: conversor_openai
+deactivate Director
+
+Main -> Strategy: convert()
+activate Strategy
+
+Strategy -> Strategy: _convert_pdf_to_images()
+activate Strategy
+Strategy -> PDF: open(pdf_path)
+loop Para cada página
+    Strategy -> PDF: get_pixmap()
+    PDF --> Strategy: pixmap
+    Strategy -> PDF: save(image_path)
+end
+Strategy -> PDF: close()
+deactivate Strategy
+
+Strategy -> Strategy: _convert_images_to_markdown()
+activate Strategy
+loop Para cada imagem
+    Strategy -> Strategy: _encode_image_to_base64()
+    Strategy -> Strategy: _transcribe_image_to_markdown()
+    activate Strategy
+    Strategy -> API: chat.completions.create()
+    API --> Strategy: markdown_content
+    deactivate Strategy
+    Strategy -> Strategy: save(markdown_file)
+end
+deactivate Strategy
+
+Strategy --> Main: void
+deactivate Strategy
+
+Main --> User: Conversão concluída
+deactivate Main
+
+@enduml

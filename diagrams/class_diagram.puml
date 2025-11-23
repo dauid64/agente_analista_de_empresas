@@ -1,0 +1,96 @@
+@startuml ClassDiagram
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam backgroundColor #FEFEFE
+
+' Strategy Pattern
+abstract class ConversorStrategy {
+    {abstract} +convert(): void
+}
+
+class ConversorOpenAI {
+    -client: Optional[OpenAI]
+    -model: Optional[str]
+    -output_dir: Optional[str]
+    -pdf_path: Optional[str]
+    -image_output_dir: Optional[str]
+    
+    +convert(): void
+    -_convert_pdf_to_images(): void
+    -_convert_images_to_markdown(): void
+    -_clear_temp_files(): void
+    -_transcribe_image_to_markdown(encoded_image: str): str
+    {static} -_encode_image_to_base64(image: bytes): str
+}
+
+ConversorStrategy <|-- ConversorOpenAI
+
+' Builder Pattern
+abstract class ConversorBuilder {
+    {abstract} +build_conversor(): ConversorBuilder
+    {abstract} +with_client(): ConversorBuilder
+    {abstract} +with_model(model_name: str): ConversorBuilder
+    {abstract} +with_markdown_output_dir(output_dir: str): ConversorBuilder
+    {abstract} +with_pdf_path(pdf_path: str): ConversorBuilder
+    {abstract} +with_image_output_dir(image_output_dir: str): ConversorBuilder
+    {abstract} +get_conversor(): ConversorStrategy
+}
+
+class ConversorOpenAIBuilder {
+    -_current_conversor: Optional[ConversorOpenAI]
+    
+    +build_conversor(): ConversorBuilder
+    +with_client(): ConversorBuilder
+    +with_model(model_name: str): ConversorBuilder
+    +with_markdown_output_dir(output_dir: str): ConversorBuilder
+    +with_pdf_path(pdf_path: str): ConversorBuilder
+    +with_image_output_dir(image_output_dir: str): ConversorBuilder
+    +get_conversor(): ConversorOpenAI
+}
+
+ConversorBuilder <|-- ConversorOpenAIBuilder
+ConversorOpenAIBuilder ..> ConversorOpenAI : <<creates>>
+
+' Director
+class Conversor <<Director>> {
+    {static} +create_openai_conversor(builder, model, pdf_path, image_output_dir, markdown_output_dir): ConversorStrategy
+}
+
+Conversor ..> ConversorBuilder : <<uses>>
+Conversor ..> ConversorStrategy : <<returns>>
+
+' External Dependencies
+class OpenAI {
+    +chat: ChatCompletion
+}
+
+ConversorOpenAI --> OpenAI : uses
+
+' Pattern Labels
+note top of ConversorStrategy
+  **STRATEGY PATTERN**
+  <<interface>>
+end note
+
+note top of ConversorOpenAI
+  **PRODUCT**
+  Objeto complexo sendo construído
+end note
+
+note top of ConversorBuilder
+  **BUILDER (Abstract)**
+  Interface do padrão Builder
+end note
+
+note top of ConversorOpenAIBuilder
+  **CONCRETE BUILDER**
+  Implementação concreta do Builder
+end note
+
+note top of Conversor
+  **DIRECTOR**
+  Orquestra a construção usando o Builder
+end note
+
+@enduml
