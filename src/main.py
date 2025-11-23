@@ -1,7 +1,7 @@
 import logging
 import os
-from conversor.ConversorImageToMarkDown import ConversorImageToMarkDownOpenAI
-from conversor.ConversorPdfToMarkdown import ConversorPdfToMarkdown
+from conversor.to_markdown.ConversorOpenAIBuilder import ConversorOpenAIBuilder
+from conversor.to_markdown.Conversor import Conversor
 from dotenv import load_dotenv
 
 def main():
@@ -18,10 +18,12 @@ def main():
 
     logging.info("Iniciando Agente Analisador de Empresas...")
 
-    conversor_image_to_markdown = ConversorImageToMarkDownOpenAI()
-    conversorPdfToMarkdown = ConversorPdfToMarkdown(conversor_image_to_markdown)
+    conversor = Conversor()
+    builder = ConversorOpenAIBuilder()
 
-    conversorPdfToMarkdown.convert_pdf_to_markdown()
+    conversor_openai = conversor.create_openai_conversor(builder)
+
+    conversor_openai.convert()
 
 if __name__ == "__main__":
     main()

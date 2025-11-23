@@ -3,6 +3,4 @@ venv
 __pycache__/
 
 
-data/image/*
-data/pdf/*
-data/markdown/*
+data/*
